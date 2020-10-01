@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>canvas-clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" style="display: block;background-color: black;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+    <script>
+        var WIDTH, HEIGHT, LEFT, TOP, RADIUS, timeSeconds, balls = [], timer
+        window.onload = function () {
+            /** @type {HTMLCanvasElement} */
+            var canvas = document.getElementById('canvas'),
+                context = canvas.getContext('2d')
+            // 自适应窗口大小
+            WIDTH = document.documentElement.clientWidth
+            HEIGHT = document.documentElement.clientHeight
+            // 边距（先计算RADIUS）
+            RADIUS = Math.round(WIDTH / 170)
+            LEFT = Math.round((WIDTH - 107 * RADIUS) / 2)
+            TOP = Math.round((HEIGHT - 20 * RADIUS) / 3)
+            timeSeconds = getTime()
+            // 画布宽高
+            canvas.width = WIDTH
+            canvas.height = HEIGHT
+            animation(context)
+            // 监听当前页面是否被隐藏
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState == 'hidden') {
+                    clearInterval(timer)
+                } else if (document.visibilityState == 'visible') {
+                    animation(context)
+                }
+            })
+        }
+        // 小球下落动画
+        function animation(context) {
+            timer = setInterval(function () {
+                render(context)
+                update()
+            }, 50)
+        }
+        // 渲染页面
+        function render(cxt) {
+            var hours = parseInt(timeSeconds / 3600),
+                minutes = parseInt((timeSeconds - hours * 3600) / 60)
+            seconds = timeSeconds % 60
+            // 首先清空画布
+            cxt.clearRect(0, 0, WIDTH, HEIGHT)
+            renderDigit(LEFT, TOP, parseInt(hours / 10), cxt)
+            renderDigit(LEFT + 15 * RADIUS, TOP, parseInt(hours % 10), cxt)
+            renderDigit(LEFT + 30 * RADIUS, TOP, 10, cxt)
+            renderDigit(LEFT + 39 * RADIUS, TOP, parseInt(minutes / 10), cxt)
+            renderDigit(LEFT + 54 * RADIUS, TOP, parseInt(minutes % 10), cxt)
+            renderDigit(LEFT + 69 * RADIUS, TOP, 10, cxt)
+            renderDigit(LEFT + 78 * RADIUS, TOP, parseInt(seconds / 10), cxt)
+            renderDigit(LEFT + 93 * RADIUS, TOP, parseInt(seconds % 10), cxt)
+            // 渲染下落的小球
+            for (var i = 0; i < balls.length; i++) {
+                cxt.fillStyle = balls[i].color
+                cxt.beginPath()
+                cxt.arc(balls[i].x, balls[i].y, RADIUS, 0, 2 * Math.PI, true)
+                cxt.closePath()
+                cxt.fill()
+            }
+        }
+        // 更新画布
+        function update() {
+            var nextTimeSeconds = getTime(),
+                nextHours = parseInt(nextTimeSeconds / 3600),
+                nextMinutes = parseInt((nextTimeSeconds - nextHours * 3600) / 60),
+                nextSeconds = nextTimeSeconds % 60,
+                curHours = parseInt(timeSeconds / 3600),
+                curMinutes = parseInt((timeSeconds - curHours * 3600) / 60),
+                curSeconds = timeSeconds % 60
+            if (nextSeconds !== curSeconds) {
+                // 判断被改变的数字，判断小球位置
+                if (parseInt(curHours / 10) != parseInt(nextHours / 10)) {
+                    addBalls(LEFT + 0, TOP, parseInt(curHours / 10))
+                }
+                if (parseInt(curHours % 10) != parseInt(nextHours % 10)) {
+                    addBalls(LEFT + 15 * RADIUS, TOP, parseInt(curHours / 10))
+                }
+                if (parseInt(curMinutes / 10) != parseInt(nextMinutes / 10)) {
+                    addBalls(LEFT + 39 * RADIUS, TOP, parseInt(curMinutes / 10))
+                }
+                if (parseInt(curMinutes % 10) != parseInt(nextMinutes % 10)) {
+                    addBalls(LEFT + 54 * RADIUS, TOP, parseInt(curMinutes % 10))
+                }
+                if (parseInt(curSeconds / 10) != parseInt(nextSeconds / 10)) {
+                    addBalls(LEFT + 78 * RADIUS, TOP, parseInt(curSeconds / 10))
+                }
+                if (parseInt(curSeconds % 10) != parseInt(nextSeconds % 10)) {
+                    addBalls(LEFT + 93 * RADIUS, TOP, parseInt(nextSeconds % 10))
+                }
+                // 同步显示时间
+                timeSeconds = nextTimeSeconds
+            }
+            updateBalls()
+        }
+        // 按照数字添加小球个数
+        function addBalls(x, y, num) {
+            for (var i = 0; i < digit[num].length; i++){
+                for (var j = 0; j < digit[num][i].length; j++){
+                    if (digit[num][i][j] == 1) {
+                        var aBall = {
+                            x: x + j * 2 * RADIUS + RADIUS,
+                            y: y + i * 2 * RADIUS + RADIUS,
+                            g: 1.5 + Math.random(),
+                            vx: Math.pow(-1, Math.ceil(Math.random() * 1000)) * 4,
+                            vy: -5,
+                            color: getRandomColor()
+                        }
+                        balls.push(aBall)
+                    }
+                }
+            }
+        }
+        // 更新下落小球的位置
+        function updateBalls() {
+            for (var i = 0; i < balls.length; i++) {
+                balls[i].x += balls[i].vx
+                balls[i].y += balls[i].vy
+                balls[i].vy += balls[i].g
+                // 反弹效果
+                if (balls[i].y >= HEIGHT - RADIUS) {
+                    balls[i].y = HEIGHT - RADIUS
+                    balls[i].vy = - Math.abs(balls[i].vy) * 0.75
+                }
+            }
+            // 删除超出界面外的小球
+            for (var i = 0; i < balls.length; i++) {
+                if (balls[i].x + RADIUS < 0 || balls[i].x - RADIUS > WIDTH) {
+                    balls.splice(i, 1)
+                }
+            }
+        }
+        // 获取时间
+        function getTime() {
+            var curTime = new Date()
+            return curTime.getHours() * 3600 + curTime.getMinutes() * 60 + curTime.getSeconds()
+        }
+        // 渲染数字
+        function renderDigit(x, y, num, cxt) {
+            cxt.fillStyle = "rgb(0,102,153)"
+            for (var i = 0; i < digit[num].length; i++) {
+                for (var j = 0; j < digit[num][i].length; j++) {
+                    if (digit[num][i][j] == 1) {
+                        cxt.beginPath()
+                        cxt.arc(x + j * 2 * RADIUS + RADIUS, y + i * 2 * RADIUS + RADIUS, RADIUS, 0, 2 * Math.PI)
+                        cxt.closePath()
+                        cxt.fill()
+                    }
+                }
+            }
+        }
+        // 获取随机颜色
+        function getRandomColor() {
+            return '#' +
+                (function (color) {
+                    return (color += '5678956789defdef'[Math.floor(Math.random() * 16)]) &&
+                        (color.length == 6) ? color : arguments.callee(color)
+                })('')
+        }
+    </script>
+    <script src="./digit.js"></script>
+</body>
+
+</html>

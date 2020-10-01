@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			ul{
+				list-style-type: none;
+			}
+			body{
+				height: 100%;
+				overflow: hidden;
+				background-color: #000;
+			}
+			
+			.box,ul,li,.year{
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				margin: auto;
+			}
+			.box{
+				width: 100%;
+				height: 100%;
+			}
+			.box ul{
+				width: 0px;
+				height: 0px;
+			}
+			.box li{
+				height: 30px;
+				transform-origin: left center;
+				color: rgba(255,255,255,0.5);
+				line-height: 30px;
+				font-size: 12px;
+				box-sizing: border-box;
+			}
+			.box span{
+				display: block;
+				float: right;
+				width: 50px;
+				text-align: center;
+			}
+			.ul1 li{
+				width: 330px;
+			}
+			.ul2 li{
+				width: 275px;
+			}
+			.ul3 li{
+				width: 220px;
+			}
+			.ul4 li{
+				width: 165px;
+			}
+			.ul5 li{
+				width: 110px;
+			}
+			.year{
+				width: 100px;
+				height: 80px;
+				color: #fff;
+				font-size: 20px;
+				text-align: center;
+				line-height: 80px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="box">
+			<ul class="ul1"></ul>
+			<ul class="ul2"></ul>
+			<ul class="ul3"></ul>
+			<ul class="ul4"></ul>
+			<ul class="ul5"></ul>
+			<div class="year"></div>
+		</div>
+		<script type="text/javascript">
+			var ul1 = document.querySelector('.ul1');
+			var ul2 = document.querySelector('.ul2');
+			var ul3 = document.querySelector('.ul3');
+			var ul4 = document.querySelector('.ul4');
+			var ul5 = document.querySelector('.ul5');
+			var year = document.querySelector('.year');
+			var time = new Date();
+			//两位数转换汉字形式函数
+			function toCN(num){
+				var arr = ['零','一','二','三','四','五','六','七','八','九'];
+				var n = num/10;
+				var cn = '';
+				if(n < 1){
+					cn = arr[num];
+				}else if(Math.floor(n) != 1 && num%10 != 0){
+					cn = arr[Math.floor(n)] + '十' + arr[num%10];
+				}else if(Math.floor(n) == 1 && num%10 != 0){
+					cn = '十' + arr[num%10];
+				}else if(num == 10){
+					cn = "十";
+				}else{
+					cn = arr[Math.floor(n)] + '十';
+				}
+				return cn;
+			}
+			//创建ul60个的表盘
+			function cul60(obj,str){
+				for(var i = 0; i < 60; i ++){
+					var li = document.createElement('li');
+					li.innerHTML = "<span>" + toCN(i) + str + "</span>";
+					li.style.transform = "rotate("+ i*6 +"deg)"
+					obj.appendChild(li);
+				}
+			}
+			//创建24小时表盘
+			function cul24(){
+				for(var i = 0; i < 24; i ++){
+					var li = document.createElement('li');
+					li.innerHTML = "<span>" + toCN(i) + "时</span>";
+					li.style.transform = "rotate("+ i*15 +"deg)"
+					ul3.appendChild(li);
+				}
+			}
+			//创建日期的31天
+			function cul31(){
+				for(var i = 1; i <= 31; i ++){
+					var li = document.createElement('li');
+					li.innerHTML = "<span>" + toCN(i) + "日</span>";
+					li.style.transform = "rotate("+ (i-1)*360/31 +"deg)"
+					ul4.appendChild(li);
+				}
+			}
+			//创建12个月份
+			function cul12(){
+				for(var i = 1; i <= 12; i ++){
+					var li = document.createElement('li');
+					li.innerHTML = "<span>" + toCN(i) + "月</span>";
+					li.style.transform = "rotate("+ (i-1)*30 +"deg)"
+					ul5.appendChild(li);
+				}
+			}
+			//获取年份
+			function years(){
+				var y = time.getFullYear();
+				year.innerText = y + "年";
+			}
+			//旋转动画
+			function move(obj,num,deg,n){
+				if(num == 0){
+					obj.style.transition = "none";
+					obj.style.transform = "rotate(0deg)";
+				}else{
+					obj.style.transition = "0.5s";
+					obj.style.transform = "rotate("+ deg +"deg)";
+				}
+				var lis = obj.querySelectorAll('li');
+				setTimeout(function(){
+					for(var i = 0; i < lis.length; i ++){
+						lis[i].style.color = 'rgba(255,255,255,0.5)';
+					}
+					lis[n].style.color = 'rgba(255,255,255,1)';
+				},100);
+				
+				
+			}
+			window.onload = function(){
+				cul60(ul1,"秒");
+				cul60(ul2,"分");
+				cul24();
+				cul31();
+				cul12();
+				years();
+				setInterval(function(){
+					var time = new Date();
+					var s = time.getSeconds();
+					var m = time.getMinutes();
+					var h = time.getHours();
+					var d = time.getDate();
+					var mo = time.getMonth();
+					
+					//秒
+					move(ul1,s,-s*6,s);
+					//分
+					move(ul2,m,-m*6,m);
+					//时
+					move(ul3,h,-h*15,h);
+					//日
+					move(ul4,d,-(d-1)*360/31,d-1);
+					//月
+					move(ul5,mo,-mo*30,mo);
+				},1000);
+			}
+		</script>
+	</body>
+</html>

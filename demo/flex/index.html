@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>flexbox sample page</title>
+<style type="text/css">
+*{margin:0; padding:0;}
+body>div,body>p{padding:20px;}
+.test_radio{width:160px; line-height:1.8; float:left; margin-bottom: 20px;}
+p {line-height:1.8;font:1.2em bold red;clear: both;}
+.pDiv {
+	border: 1px solid blue;
+	padding: 5px;
+	display: inline-block;
+}
+.pDiv div {
+	border: 1px solid red;
+	width: 50px;
+	line-height: 50px;
+	text-align: center;
+}
+.flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.align-content div:nth-child(n) { height: 50px; }
+</style>
+</head>
+
+<body>
+<p>display</p>
+<div class="test_radio">
+	<input type="radio" name="dp" id="dpf" value="flex" checked=""><label for="dpf">flex</label><br>
+	<input type="radio" name="dp" id="dpif" value="inline-flex"><label for="dpif">inline-flex</label><br>
+</div>
+<div class="pDiv flex" id="sampledp" style="display: flex;">
+	<div>1</div>
+	<div>2</div>
+	<div>3</div>
+	<div>4</div>
+</div>
+<p>flex-direction</p>
+<div class="test_radio">
+	<input type="radio" name="fd" id="fdr" value="row" checked=""><label for="fdr">row</label><br>
+	<input type="radio" name="fd" id="fdrr" value="row-reverse"><label for="fdrr">row-reverse</label><br>
+	<input type="radio" name="fd" id="fdc" value="column"><label for="fdc">column</label><br>
+	<input type="radio" name="fd" id="fdcr" value="column-reverse"><label for="fdcr">column-reverse</label><br>
+</div>
+<div class="pDiv flex" id="samplefd" style="flex-direction: row;">
+	<div>1</div>
+	<div>2</div>
+	<div>3</div>
+	<div>4</div>
+</div>
+<p>flex-wrap  (需要缩小浏览器尺寸看换行效果)</p>
+<div class="test_radio">
+	<input type="radio" name="fw" id="fwnw" value="nowrap" checked=""><label for="fwnw">nowrap</label><br>
+	<input type="radio" name="fw" id="fww" value="wrap"><label for="fww">wrap</label><br>
+	<input type="radio" name="fw" id="fwwr" value="wrap-reverse"><label for="fwwr">wrap-reverse</label><br>
+</div>
+<div class="pDiv flex" id="samplefw">
+	<div>1</div>
+	<div>2</div>
+	<div>3</div>
+	<div>4</div>
+	<div>5</div>
+	<div>6</div>
+	<div>7</div>
+	<div>8</div>
+	<div>9</div>
+	<div>10</div>
+</div>
+<p>justify-content</p>
+<div class="test_radio">
+	<input type="radio" name="jf" id="jffs" value="flex-start" checked=""><label for="jffs">flex-start</label><br>
+	<input type="radio" name="jf" id="jffe" value="flex-end"><label for="jffe">flex-end</label><br>
+	<input type="radio" name="jf" id="jfc" value="center"><label for="jfc">center</label><br>
+	<input type="radio" name="jf" id="jfsb" value="space-between"><label for="jfsb">space-between</label><br>
+	<input type="radio" name="jf" id="jfsa" value="space-around"><label for="jfsa">space-around</label><br>
+</div>
+<div class="pDiv flex" id="samplejf">
+	<div>1</div>
+	<div>2</div>
+	<div>3</div>
+	<div>4</div>
+</div>
+<p>align-items</p>
+<div class="test_radio">
+	<input type="radio" name="ai" id="aifs" value="flex-start" checked=""><label for="aifs">flex-start</label><br>
+	<input type="radio" name="ai" id="aife" value="flex-end"><label for="aife">flex-end</label><br>
+	<input type="radio" name="ai" id="aic" value="center"><label for="aic">center</label><br>
+	<input type="radio" name="ai" id="aib" value="baseline"><label for="aib">baseline</label><br>
+	<input type="radio" name="ai" id="ais" value="stretch"><label for="ais">stretch</label><br>
+</div>
+<div class="pDiv flex" id="sampleai">
+	<div style="height: 100px;">1</div>
+	<div style="height: 80px;">2</div>
+	<div style="font-size:0.5em;">3</div>
+	<div style="font-size:1.5em;">4</div>
+</div>
+<p>align-content  (需要缩小浏览器尺寸看多行效果)</p>
+<div class="test_radio">
+	<input type="radio" name="ac" id="acfs" value="flex-start" checked=""><label for="acfs">flex-start</label><br>
+	<input type="radio" name="ac" id="acfe" value="flex-end"><label for="acfe">flex-end</label><br>
+	<input type="radio" name="ac" id="acc" value="center"><label for="acc">center</label><br>
+	<input type="radio" name="ac" id="acsb" value="space-between"><label for="acsb">space-between</label><br>
+	<input type="radio" name="ac" id="acsa" value="space-around"><label for="acsa">space-around</label><br>
+	<input type="radio" name="ac" id="acs" value="stretch"><label for="acs">stretch</label><br>
+</div>
+<div class="pDiv flex flex-wrap align-content" id="sampleac" style="height: 200px; align-content: center;">
+	<div>1</div>
+	<div>2</div>
+	<div>3</div>
+	<div>4</div>
+	<div>5</div>
+	<div>6</div>
+	<div>7</div>
+	<div>8</div>
+	<div>9</div>
+	<div>10</div>
+</div>
+
+<script>
+var inputs = document.getElementsByTagName("input"), 
+	ilen = inputs.length,
+	sampledp = document.getElementById("sampledp"),
+	samplefd = document.getElementById("samplefd"),
+	samplefw = document.getElementById("samplefw"),
+	samplejf = document.getElementById("samplejf"),
+	sampleai = document.getElementById("sampleai"),
+	sampleac = document.getElementById("sampleac"),
+	i = 0;
+
+for (i=0; i<ilen; i++) {
+	switch(inputs[i].name) {
+	case "dp":
+		inputs[i].onclick = function() {
+			sampledp.style["display"] = this.value;
+		};
+		break;
+	case "fd":
+		inputs[i].onclick = function() {
+			samplefd.style["flex-direction"] = this.value;
+		};
+		break;
+	case "fw":
+		inputs[i].onclick = function() {
+			samplefw.style["flex-wrap"] = this.value;
+		};
+		break;
+	case "jf":
+		inputs[i].onclick = function() {
+			samplejf.style["justify-content"] = this.value;
+		};
+		break;
+	case "ai":
+		inputs[i].onclick = function() {
+			sampleai.style["align-items"] = this.value;
+		};
+		break;
+	case "ac":
+		inputs[i].onclick = function() {
+			sampleac.style["align-content"] = this.value;
+		};
+		break;
+	default:
+		break;
+	}
+}
+</script>
+
+
+</body></html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="https://lwlblog.top/images/favicon-16x16-next.png" sizes="16x16" type="image/png">
+	<link rel="icon" href="https://lwlblog.top/images/favicon-32x32-next.png" sizes="32x32" type="image/png">
+	<title>Demo</title>
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+			color: #fff;
+		}
+		canvas {
+			display: block;
+			background: #044e8e;
+			position: fixed;
+			z-index: -1;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="myCanvas" width="1980" height="1080"></canvas>
+	<h3>有待完善！</h3>
+	<script src="./lib/jquery/jquery-3.4.1.min.js"></script>
+	<script src="./lib/canvas-bg.js"></script>
+	<script>
+		$(function() {
+			const WIDTH = $(window).width();
+			$bg.init({
+				number: 5,
+				speed: 2,
+				lose: .6,
+				size: WIDTH >= 700 ? 90 : 50
+			})
+		})
+	</script>
+</body>
+</html>

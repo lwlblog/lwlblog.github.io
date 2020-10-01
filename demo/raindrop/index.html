@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>雨滴效果</title>
+		<style type="text/css">
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			.rain{
+				background-color: black;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas class="rain"></canvas>
+		<script type="text/javascript">
+			var canvas=document.querySelector(".rain");
+			//var canvas=document.getElementsByClassName("rain")[0];
+			var w,h;
+			~~function setSize(){
+				window.onresize=arguments.callee;  /*画布大小随窗口的变化而变化*/
+				w=window.innerWidth;
+				h=window.innerHeight;
+				canvas.width=w;
+				canvas.height=h;
+			}();
+			var canCon=canvas.getContext("2d");
+			var aRain=[];
+			function random(min,max){
+				return Math.random()*(max-min)+min;
+			}
+			function Rain(){};
+			Rain.prototype={
+				//初始化
+				init:function(){
+					this.x=random(0,w);	//雨滴顶部开始位置横向随机坐标
+					this.y=0;			//从顶部开始落下
+					this.vY=random(3,5);//下落速度随机数
+					this.h=random(0.8*h,0.9*h);//下落高度
+					this.r=1;//圆的半径
+					this.vr=1;//圆的速度
+				},
+				//画
+				draw:function(){
+					if(this.y<this.h){
+						//在高度范围内画线
+						canCon.beginPath();
+						canCon.fillStyle="#5ff";
+						canCon.fillRect(this.x,this.y,4,-10);
+					}else{
+						//画圆
+						canCon.beginPath();
+						canCon.strokeStyle="#5ff";
+						canCon.arc(this.x,this.y,this.r,0,Math.PI*2);
+						canCon.stroke();
+					}
+				},
+				//动画效果
+				move:function(){
+					if(this.y<this.h){
+						this.y+=this.vY;
+					}else{
+						if(this.r<80){
+							this.r+=this.vr;
+						}else{
+							this.init();//归零
+						}
+					}
+					this.draw();
+				}
+			}
+			function createRain(num){
+				for(var i=0;i<num;i++){
+					setTimeout(function(){//一段时间后执行
+						var rain=new Rain();
+						rain.init();
+						rain.draw();
+						aRain.push(rain);
+					},300*i)//第一个循环从0开始，所以直接执行
+				}
+			}
+			createRain(30);
+			setInterval(function(){//每隔一段时间执行
+				canCon.fillStyle="rgba(0,0,0,0.05)";
+				canCon.fillRect(0,0,w,h);
+				for(var item of aRain){
+					item.move();
+				}
+			},1000/60);
+		</script>
+	</body>
+</html>

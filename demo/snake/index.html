@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>贪吃蛇小游戏</title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			ul{
+				list-style: none;
+			}
+			html,body{
+				width: 100%;
+				height: 100%;
+				background-color: #000;
+			}
+			.box,.btn,.end,ul{
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				margin: auto;
+				z-index: 100;
+			}
+			.box{
+				width: 600px;
+				height: 600px;
+				box-shadow: 0 0 0 10px #fff;
+			}
+			.btn,li{
+				width: 200px;
+				height: 60px;
+				border-radius: 50%;
+				border: 5px solid #fff;
+				color: #fff;
+				font-family: "楷体";
+				font-size: 30px;
+				text-align: center;
+				line-height: 60px;
+				cursor: pointer;
+				-webkit-user-select: none;
+				transition: 0.3s;
+			}
+			.btn:hover,li:hover{
+				background-color: #6EB3D8;
+				color: red;
+			}
+			.btnBox ul{
+				display: none;
+				width: 210px;
+				height: 310px;
+			}
+			.btnBox ul li{
+				margin-top: 25px;
+			}
+			p{
+				color: #fff;
+				font-size: 2em;
+				font-family: "楷体";
+				text-align: center;
+			}
+			.score{
+				line-height: 100px;
+			}
+			.score span{
+				color: red;
+			}
+			.end{
+				display: none;
+				width: 300px;
+				height: 160px;
+				padding-top: 40px;
+				border: 5px solid #fff;
+				border-radius: 50px;
+			}
+			.end p{
+				color: blue;
+				line-height: 60px;
+			}
+		</style>
+	</head>
+	<body>
+		<p class="score">分数：<span id="scoreBox">0</span></p>
+		<div class="box">
+			<div class="btnBox">
+				<div class="btn">开始游戏</div>
+				<ul>
+					<li>简单</li>
+					<li>困难</li>
+					<li>外挂</li>
+				</ul>
+			</div>
+		</div>
+		<div class="end">
+			<p>游戏结束!</p>
+			<p>你的成绩为：<span id="endScore"></span>分</p>
+		</div>
+		<script type="text/javascript">
+			var box = document.querySelector('.box');
+			var btn = document.querySelector('.btn');
+			var foodBox = document.querySelector('.foodBox');
+			var end = document.querySelector('.end');
+			var lis = box.getElementsByTagName('li');
+			var ul = box.getElementsByTagName('ul')[0];
+			var upScore = document.querySelector('#score');
+			var endScore = document.querySelector('#endScore');
+			var snakeBox = document.getElementsByClassName('snakeBox');
+			var snakeArr = [[2,0,'head'],[1,0,'body'],[0,0,'body']];
+			var direct,right,up,down,left,timer,foodX,foodY;
+			var score = 0;
+			var speed = 500;
+			window.onload = function(){
+				game();
+			}
+			function game(){
+				btn.onclick = function(){
+					this.style.display = 'none';
+					ul.style.display = 'block';
+					lis[0].onclick = function(){
+						ul.style.display = 'none';
+						speed = 400;
+						start();
+					}
+					lis[1].onclick = function(){
+						ul.style.display = 'none';
+						speed = 150;
+						start();
+					}
+					lis[2].onclick = function(){
+						ul.style.display = 'none';
+						snakeArr = [[12,0,'head'],[11,0,'body'],[10,0,'body'],[9,0,'body'],[8,0,'body'],[7,0,'body'],[6,0,'body'],[5,0,'body'],[4,0,'body'],[3,0,'body'],[2,0,'body'],[1,0,'body'],[0,0,'body']];
+						score = 1000;
+						scoreBox.innerHTML = score;
+						speed = 400;
+						start();
+					}
+				}
+			}
+			function start(){
+				//初始化方向
+				direct = 'right';
+				left = false;
+				right = false;
+				up = true;
+				down = true;
+				food();
+				snake();
+				document.onkeydown = function(e){
+					setDerict(e.keyCode);
+				}
+				time();
+			}
+			function snake(){
+				for(var i = 0; i < snakeArr.length; i ++){
+					var snake = document.createElement('div');
+					snake.style.cssText = 'position: absolute;border-radius: 50%;'
+					snake.style.width = box.offsetWidth/20 + 'px';
+					snake.style.height = box.offsetHeight/20 + 'px';
+					snake.style.left = snakeArr[i][0] * box.offsetWidth/20 + 'px';
+					snake.style.top = snakeArr[i][1] * box.offsetHeight/20 + 'px';
+					//蛇头红色
+					if(i == 0){
+						snake.style.zIndex = 10;
+						snake.style.backgroundColor = 'red';
+					}else{
+						snake.style.backgroundColor = 'yellow';
+					}
+					box.appendChild(snake).setAttribute('class','snakeBox');
+				}
+			}
+			function move(){
+				//修改数组
+				//后一个body移动到前一个body上
+				for(var i = snakeArr.length - 1; i > 0; i --){
+					snakeArr[i][0] = snakeArr[i-1][0];
+					snakeArr[i][1] = snakeArr[i-1][1];
+				}
+				//根据方向判断头的下一个位置
+				switch(direct) {
+					case 'right':
+						snakeArr[0][0] += 1;
+						break;
+					case 'up':
+						snakeArr[0][1] -= 1;
+						break;
+					case 'left':
+						snakeArr[0][0] -= 1;
+						break;
+					case 'down':
+						snakeArr[0][1] += 1;
+						break;
+					default:
+						break;
+				}
+				//对数组重新进行定位
+				for(var j = 0; j < snakeBox.length; j ++){
+					snakeBox[j].style.left = snakeArr[j][0] * box.offsetWidth/20 + 'px';
+					snakeBox[j].style.top = snakeArr[j][1] * box.offsetHeight/20 + 'px';
+				}
+				//判断是否吃到食物
+				if(snakeArr[0][0] == foodX && snakeArr[0][1] == foodY){
+					var endX = snakeArr[snakeArr.length-1][0];
+					var endY = snakeArr[snakeArr.length-1][1];
+					score ++;
+					scoreBox.innerHTML = score;
+					removeClass('foodBox');
+					removeClass('snakeBox');
+					snakeArr.push([endX, endY, 'body']);
+					snake();
+					food();
+				}
+				//判断是否出界，出界退出游戏
+				if(snakeArr[0][0] >= 20 || snakeArr[0][1] >= 20 || snakeArr[0][0] < 0 || snakeArr[0][1] < 0){
+					clearInterval(timer);
+					removeClass('snakeBox');
+					removeClass('foodBox');
+					end.style.display = 'block';
+					endScore.innerHTML = score;
+				}
+			}
+			function food(){
+				var food = document.createElement('div');
+				food.style.cssText = 'position: absolute;border-radius: 50%;';
+				food.style.width = box.offsetWidth/20 + 'px';
+				food.style.height = box.offsetHeight/20 + 'px';
+				foodX = Math.floor(Math.random()*20);
+				foodY = Math.floor(Math.random()*20);
+				food.style.left = foodX * box.offsetWidth/20 + 'px';
+				food.style.top = foodY * box.offsetHeight/20 + 'px';
+				food.style.backgroundColor = 'blue';
+				box.appendChild(food).setAttribute('class','foodBox');
+				//判断食物是否出现在蛇身上，如果出现在蛇身上则重新生成食物
+				for(var i = 0; i < snakeArr.length; i ++){
+					if(snakeArr[i][0] == foodX && snakeArr[i][1] == foodY){
+						removeClass('foodBox');
+						return arguments.callee();
+					}
+				}
+			}
+			function setDerict(code) {
+				switch(code) {
+					case 37:
+						if(left) {
+							direct = 'left';
+							left = false;
+							right = false;
+							up = true;
+							down = true;
+						}
+						break;
+					case 38:
+						if(up) {
+							direct = 'up';
+							left = true;
+							right = true;
+							up = false;
+							down = false;
+						}
+						break;
+					case 39:
+						if(right) {
+							direct = 'right';
+							left = false;
+							right = false;
+							up = true;
+							down = true;
+						}
+						break;
+					case 40:
+						if(down) {
+							direct = 'down';
+							left = true;
+							right = true;
+							up = false;
+							down = false;
+						}
+						break;
+					default:
+						break;
+				}
+				
+			}
+			//删除节点
+			function removeClass(className) {
+				var ele = document.getElementsByClassName(className);
+				while(ele.length > 0) {
+					ele[0].parentNode.removeChild(ele[0]);
+				}
+			}
+			function time(){
+				timer = setInterval(function(){
+					move();
+				},speed);
+			}
+			
+		</script>
+	</body>
+</html>
